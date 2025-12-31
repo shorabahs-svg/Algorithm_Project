@@ -38,7 +38,7 @@ internal class Program
             // Calculate the average.
             n.average = (n.mark1 + n.mark2) / 2;
             // Selection of the grade manually by the user.
-            Console.WriteLine("Select the appropriate grade: (0: Failed, 1: Good, 2: Very Good, 3: Excellent");
+            Console.WriteLine("Select the appropriate grade: (0: Failed, 1: Good, 2: Very Good, 3: Excellent)");
             n.grade = (Grade)int.Parse(Console.ReadLine());
             if (First == null) // The menu is empty (No students)
             {
