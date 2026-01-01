@@ -1,175 +1,175 @@
-﻿
-using System.Collections.Generic;
+using System;
 
-internal class Program
+enum Grade { Failed, Good, VeryGood, Excellent }
+
+class StdNode
 {
-    enum Grade { Failed, Good, VeryGood, Excellent}
-    class StdNode
+    public int id;
+    public string name;
+    public string governorate;
+    public float mark1;
+    public float mark2;
+    public float average;
+    public Grade grade;
+    public StdNode Next;
+    public StdNode Prev;
+}
+
+class DLinkList
+{
+    public StdNode First;
+    public StdNode Last;
+
+    public void AddStd(bool End)
     {
-        public int id;
-        public string name;
-        public string governorate;
-        public float mark1;
-        public float mark2;
-        public float average;
-        public Grade grade;
-        public StdNode Next; // Refers to the next node.
-        public StdNode Prev; // Refers to the previous node.
+        StdNode n = new StdNode();
+        Console.WriteLine("\nEnter the Data of the new student");
+        Console.Write("University Number: ");
+        n.id = int.Parse(Console.ReadLine());
+        Console.Write("Full Name: ");
+        n.name = Console.ReadLine();
+        Console.Write("Governorate: ");
+        n.governorate = Console.ReadLine();
+        Console.Write("Mark 1: ");
+        n.mark1 = float.Parse(Console.ReadLine());
+        Console.Write("Mark 2: ");
+        n.mark2 = float.Parse(Console.ReadLine());
+        n.average = (n.mark1 + n.mark2) / 2;
+
+        Console.WriteLine("Select grade: (0: Failed, 1: Good, 2: Very Good, 3: Excellent)");
+        n.grade = (Grade)int.Parse(Console.ReadLine());
+
+        if (First == null)
+        {
+            First = Last = n;
+        }
+        else if (End)
+        {
+            // FIX: Correctly link to the end and update 'Last'
+            Last.Next = n;
+            n.Prev = Last;
+            Last = n; 
+        }
+        else
+        {
+            // FIX: Correctly link to the start and update 'First'
+            n.Next = First;
+            First.Prev = n;
+            First = n;
+        }
+        Console.WriteLine("Student data saved successfully");
     }
-    class DLinkList
+
+    public void RecursiveSearchByScore(StdNode current, float score)
     {
-        public StdNode First;
-        public StdNode Last;
-        // Add a new student (At the start or at the end.
-        public void AddStd(bool End) 
+        if (current == null) return;
+        
+        if (current.average == score)
         {
-            StdNode n = new StdNode();
-            Console.WriteLine("Enter the Data of the new student");
-            Console.Write("University Number: ");
-            n.id = int.Parse(Console.ReadLine());
-            Console.Write("Full Name: ");
-            n.name = Console.ReadLine();
-            Console.Write("Governorate: ");
-            n.governorate = Console.ReadLine();
-            Console.Write("Mark 1: ");
-            n.mark1 = float.Parse(Console.ReadLine());
-            Console.Write("Mark 2: ");
-            n.mark2 = float.Parse(Console.ReadLine());
-            // Calculate the average.
-            n.average = (n.mark1 + n.mark2) / 2;
-            // Selection of the grade manually by the user.
-            Console.WriteLine("Select the appropriate grade: (0: Failed, 1: Good, 2: Very Good, 3: Excellent)");
-            n.grade = (Grade)int.Parse(Console.ReadLine());
-            if (First == null) // The menu is empty (No students)
-            {
-                First = Last = n;
-            }
-            else if (End) // Adding to the end of the list
-            {
-                Last.Next = n;
-                n.Prev = Last;
-                First = n;
-            }
-            else // Adding to the beginning of the list
-            {
-                n.Next = First;
-                First.Prev = n;
-                First = n;
-            }
-            Console.WriteLine("Student data saved successfully");
+            Console.WriteLine($"Found: {current.name}, Gov: {current.governorate}");
         }
-        // Recursive search for a specific mark.
-        public void RecursiveSearchByScore(StdNode current, float score)
+        RecursiveSearchByScore(current.Next, score);
+    }
+
+    public void Sort(bool scoresort)
+    {
+        if (First == null || First.Next == null) return;
+        bool swapped;
+        do
         {
-            if (current == null)
+            swapped = false;
+            StdNode current = First;
+            while (current.Next != null)
             {
-                return; // Stopping state (The end of List.
-            }
-            if (current.average == score)
-            {
-                Console.WriteLine($"We found a student. Name: {current.name}, Governorate: {current.governorate}");
-            }
-            // Calling of the same method with the next node.
-            RecursiveSearchByScore(current.Next, score);
-        }
-        public void Sort (bool scoresort) // Bubble sort of the list
-        {
-            if (First == null) return;
-            bool swapped;
-            do
-            {
-                swapped = false;
-                StdNode current = First;
-                while (current.Next != null)
+                bool shouldSwap = scoresort ? 
+                    current.average > current.Next.average : 
+                    string.Compare(current.name, current.Next.name) > 0;
+
+                if (shouldSwap)
                 {
-                    bool swap = false;
-                    if (scoresort) // Sort by Average (Ascending).
-                    {
-                        swap = current.average > current.Next.average;
-                    }
-                    else // Sort by name (A to Z)
-                    {
-                        swap = string.Compare(current.name, current.Next.name) > 0;
-                    }
-                    if (swap) // Swapping the data
-                    {
-                        SwapData(current, current.Next);
-                        swapped = true; 
-                    }
-                    current = current.Next;
+                    SwapData(current, current.Next);
+                    swapped = true;
                 }
+                current = current.Next;
             }
-            while (swapped);
-            Console.WriteLine("Sorted successfully!");
-        }
-        private void SwapData(StdNode a,  StdNode b)
+        } while (swapped);
+        Console.WriteLine("Sorted successfully!");
+    }
+
+    private void SwapData(StdNode a, StdNode b)
+    {
+        (a.id, b.id) = (b.id, a.id);
+        (a.name, b.name) = (b.name, a.name);
+        (a.governorate, b.governorate) = (b.governorate, a.governorate);
+        (a.mark1, b.mark1) = (b.mark1, a.mark1); // Added mark swap
+        (a.mark2, b.mark2) = (b.mark2, a.mark2); // Added mark swap
+        (a.average, b.average) = (b.average, a.average);
+        (a.grade, b.grade) = (b.grade, a.grade);
+    }
+
+    public void DisplayList()
+    {
+        if (First == null)
         {
-            // Swap all of the fields
-            (a.id, b.id) = (b.id, a.id);
-            (a.name, b.name) = (b.name, a.name);
-            (a.governorate, b.governorate) = (b.governorate, a.governorate);
-            (a.average, b.average) = (b.average, a.average);
-            (a.grade, b.grade) = (b.grade, a.grade);
+            Console.WriteLine("The List is empty");
+            return;
         }
-        public void DisplayList()
+        StdNode temp = First;
+        Console.WriteLine("\n--- Current Student Data ---");
+        while (temp != null)
         {
-            if (First == null)
-            {
-                Console.WriteLine("The List is empty");
-                return;
-            }
-            StdNode temp = First;
-            Console.WriteLine("Now showing the current data of the students");
-            while (temp != null)
-            {
-                Console.WriteLine($"Number: [{temp.id}] / Name: [{temp.name}] / Average: [{temp.average}] / Grade: [{temp.grade}]");
-                temp = temp.Next;
-            }
+            Console.WriteLine($"ID: [{temp.id}] | Name: [{temp.name}] | Avg: [{temp.average}] | Grade: [{temp.grade}]");
+            temp = temp.Next;
         }
     }
-    private static void Main(string[] args)
+}
+
+class Program // Wrapped the Main method in a class
+{
+    static void Main(string[] args)
     {
         DLinkList li = new DLinkList();
         Console.WriteLine("Welcome to the student system!");
-        for (int i = 1; i<=5; i++)
+        
+        // Reduced to 2 for testing purposes, change back to 5 if needed
+        for (int i = 1; i <= 2; i++)
         {
-            Console.WriteLine($"Student data No. [{i}]");
+            Console.WriteLine($"\nStudent data No. [{i}]");
             li.AddStd(true);
         }
+
         int option;
         do
         {
-            Console.WriteLine("**** Main Menu ****");
-            Console.WriteLine("Choose the procedure you want...");
-            Console.WriteLine("1. Add a new student (Start / End )");
-            Console.WriteLine("2. Sort Students (Name / Average )");
-            Console.WriteLine("3. Find a student by mark (Recursively)");
-            Console.WriteLine("4. Display the Full List");
+            Console.WriteLine("\n**** Main Menu ****");
+            Console.WriteLine("1. Add a new student");
+            Console.WriteLine("2. Sort Students");
+            Console.WriteLine("3. Find a student by mark");
+            Console.WriteLine("4. Display List");
             Console.WriteLine("0. Exit");
-            option = int.Parse(Console.ReadLine());
+            
+            if (!int.TryParse(Console.ReadLine(), out option)) continue;
+
             switch (option)
             {
                 case 1:
-                    Console.Write("Where do you want to add? (1. Start) , (2. End)");
+                    Console.Write("1. Start, 2. End: ");
                     li.AddStd(Console.ReadLine() == "2");
                     break;
                 case 2:
-                    Console.WriteLine("Sort by... (1. Name 'A to Z') , (Average 'Ascending')");
+                    Console.Write("1. Name, 2. Average: ");
                     li.Sort(Console.ReadLine() == "2");
                     li.DisplayList();
                     break;
                 case 3:
-                    Console.WriteLine("Input the Mark To search for...");
+                    Console.Write("Enter mark: ");
                     float score = float.Parse(Console.ReadLine());
-                    Console.WriteLine("Search Results:");
                     li.RecursiveSearchByScore(li.First, score);
                     break;
                 case 4:
                     li.DisplayList();
                     break;
-
             }
-        }
-        while (option != 0);
+        } while (option != 0);
     }
 }
